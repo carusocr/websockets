@@ -6,6 +6,9 @@ require 'yaml'
 
 cfgfile = 'auth.cfg'
 
+username=ARGV.shift
+pwd=ARGV.shift
+
 cnf = YAML::load(File.open(cfgfile))
 
 TweetStream.configure do |config|
@@ -24,8 +27,12 @@ AMQP.start(:host => 'localhost') do |connection, open_ok|
 
     stream = TweetStream::Client.new
     stream.track(keywords) do |status|
-      twitter.publish(status)
+      #twitter.publish(status.text)
+      twitter.publish(status.id)
       puts status.text
+#got socket working! But ran into this:
+#/Users/carusocr/.rvm/gems/ruby-2.1.1/gems/em-websocket-0.5.1/lib/em-websocket/connection.rb:157:in `send_text': Data sent to WebSocket must be valid UTF-8 but was ASCII-8BIT (valid: true) (EventMachine::WebSocket::WebSocketError)
+#so, need to make sure it's always converted to UTF-8 before sending
     end
   end
 end

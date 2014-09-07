@@ -34,3 +34,5 @@ EventMachine.run do
 
   App.run! :port => 3000
 end
+
+#https://developer.mozilla.org/en-US/docs/WebSockets/Writing_WebSocket_client_applications
