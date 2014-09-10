@@ -161,6 +161,11 @@ function initialize() {
 
   map = new google.maps.Map(document.getElementById('map-canvas'),
     mapOptions);
+//testing websocket
+  ws = new WebSocket("ws://localhost:8080/");
+  ws.onmessage = function(evt) {
+    alert(evt.data);
+  };
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
