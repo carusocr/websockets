@@ -3,6 +3,7 @@
 require 'amqp'
 require 'tweetstream'
 require 'yaml'
+require 'json'
 
 cfgfile = 'auth.cfg'
 
@@ -19,8 +20,8 @@ TweetStream.configure do |config|
   config.auth_method        = cnf['ebola']['a_meth']
 end
 
-#keywords = 'burrito, sushi'
-keywords = 'zokfotpik'
+keywords = 'burrito, sushi'
+#keywords = 'zokfotpik'
 
 AMQP.start(:host => 'localhost') do |connection, open_ok|
   AMQP::Channel.new(connection) do |channel, open_ok|
@@ -28,12 +29,17 @@ AMQP.start(:host => 'localhost') do |connection, open_ok|
 
     stream = TweetStream::Client.new
     stream.track(keywords) do |status|
-      #twitter.publish(status.text)
-      twitter.publish(status.id)
-      puts status.text
-#got socket working! But ran into this:
-#/Users/carusocr/.rvm/gems/ruby-2.1.1/gems/em-websocket-0.5.1/lib/em-websocket/connection.rb:157:in `send_text': Data sent to WebSocket must be valid UTF-8 but was ASCII-8BIT (valid: true) (EventMachine::WebSocket::WebSocketError)
-#so, need to make sure it's always converted to UTF-8 before sending
+      if status.geo?
+        tweet = JSON.generate(status.attrs)
+        contents = JSON.parse(tweet)
+        pt1 = contents['coordinates']['coordinates'][1]
+        pt2 = contents['coordinates']['coordinates'][0]
+        user = contents['user']['screen_name']
+        tweet_text = contents['text'].gsub("\t","").gsub("\n","")
+        tweetstring = "#{pt1}\t#{pt2}\t#{user}\t#{tweet_text}\n"
+        puts tweetstring
+        twitter.publish(tweetstring)
+      end
     end
   end
 end
