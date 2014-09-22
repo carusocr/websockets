@@ -20,8 +20,9 @@ TweetStream.configure do |config|
   config.auth_method        = cnf['ebola']['a_meth']
 end
 
-keywords = 'burrito, sushi'
+#keywords = 'burrito, sushi'
 #keywords = 'zokfotpik'
+keywords = 'RT'
 
 AMQP.start(:host => 'localhost') do |connection, open_ok|
   AMQP::Channel.new(connection) do |channel, open_ok|
