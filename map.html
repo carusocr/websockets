@@ -167,8 +167,6 @@ function initialize() {
     var points = evt.data.split("\t");
     var point = new google.maps.LatLng(parseFloat(points[0]),parseFloat(points[1]));
     var tweet_load = "<p>" + points[2] + "<br />" + points[3] + "</p>";
-    //alert(evt.data);
-    //alert(points);
     createMarker(parseFloat(points[0]),parseFloat(points[1]),tweet_load);
   };
 }
