@@ -41,6 +41,7 @@ AMQP.start(:host => 'localhost') do |connection, open_ok|
         puts tweetstring
         twitter.publish(tweetstring)
       end
+      # add else, send non loc message and update it in scrolling window?
     end
   end
 end

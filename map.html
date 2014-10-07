@@ -34,12 +34,11 @@ reader.onload = function(event) {
   console.log(contents);
 }
 
-//testing out websockets
+//websocket
 
-var scheme = "ws://";
-var uri = scheme + window.document.location.host + "/";
-//uri isn't working, why not?
-var ws = new WebSocket("ws:///Users/carusocr/projects/websockets/map.html");
+//var scheme = "ws://";
+//var uri = scheme + window.document.location.host + "/";
+//var ws = new WebSocket("ws:///Users/carusocr/projects/websockets/map.html");
 
 //ws.onmessage function(message) {
 //  var data = JSON.parse(message.data);
@@ -167,8 +166,6 @@ function initialize() {
     var points = evt.data.split("\t");
     var point = new google.maps.LatLng(parseFloat(points[0]),parseFloat(points[1]));
     var tweet_load = "<p>" + points[2] + "<br />" + points[3] + "</p>";
-    //alert(evt.data);
-    //alert(points);
     createMarker(parseFloat(points[0]),parseFloat(points[1]),tweet_load);
   };
 }
