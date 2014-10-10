@@ -25,19 +25,40 @@ keywords = 'RT'
 conn = Bunny.new
 conn.start
 ch = conn.create_channel
-tq = ch.queue("tweets")
-cq = ch.queue("command")
+$tq = ch.queue("tweets")
+$cq = ch.queue("command")
 
-cq.subscribe(:block => true) do |delivery_info, properties, body|
-  puts "Got command #{body}."
+#$cq.subscribe(:block => true) do |delivery_info, properties, body|
+#  puts "Got command #{body}."
 #  cq.publish("Acknowledged.", :routing_key => cq.name)
-end
-puts "foo"
-tq.subscribe(:block => true) do |delivery_info, properties, body|
-  puts "Got command #{body}."
+#end
+#$tq.subscribe(:block => true) do |delivery_info, properties, body|
+#  puts "Got command #{body}."
 #  tq.publish("Acknowledged.", :routing_key => tq.name)
+#end
+
+def monitor_stream(keywords)
+
+  stream = TweetStream::Client.new
+  stream.track(keywords) do |status|
+    if status.geo?
+      tweet = JSON.generate(status.attrs)
+      contents = JSON.parse(tweet)
+      pt1 = contents['coordinates']['coordinates'][1]
+      pt2 = contents['coordinates']['coordinates'][0]
+      user = contents['user']['screen_name']
+      tweet_text = contents['text'].gsub("\t","").gsub("\n","")
+      tweetstring = "#{pt1}\t#{pt2}\t#{user}\t#{tweet_text}\n"
+      puts tweetstring
+      $tq.publish(tweetstring)
+    end
+  end
 end
 
+#monitor_stream(keywords)
+# ^^^ this works!
+
+# popping a queue when there's a message returns array...pop[2] fetches body
 
 =begin
 IDEAS:
@@ -45,6 +66,7 @@ IDEAS:
 check bunny queue inside of stream track loop?
 1. start tweetstream loop
 2. if command queue isn't empty, parse data and respond to any commands
+  ch.queue.message_count should return 0 or 1
 
 while true
 run_tweetstream
