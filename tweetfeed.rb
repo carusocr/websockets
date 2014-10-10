@@ -1,14 +1,11 @@
 #!/usr/bin/env ruby
 
-require 'amqp'
+require 'bunny'
 require 'tweetstream'
 require 'yaml'
 require 'json'
 
 cfgfile = 'auth.cfg'
-
-username=ARGV.shift
-pwd=ARGV.shift
 
 cnf = YAML::load(File.open(cfgfile))
 
@@ -23,6 +20,35 @@ end
 #keywords = 'burrito, sushi'
 #keywords = 'zokfotpik'
 keywords = 'RT'
+
+
+conn = Bunny.new
+conn.start
+ch = conn.create_channel
+tq = ch.queue("tweets")
+cq = ch.queue("command")
+
+cq.subscribe(:block => true) do |delivery_info, properties, body|
+  puts "Got command #{body}."
+#  cq.publish("Acknowledged.", :routing_key => cq.name)
+end
+puts "foo"
+tq.subscribe(:block => true) do |delivery_info, properties, body|
+  puts "Got command #{body}."
+#  tq.publish("Acknowledged.", :routing_key => tq.name)
+end
+
+
+=begin
+IDEAS:
+
+check bunny queue inside of stream track loop?
+1. start tweetstream loop
+2. if command queue isn't empty, parse data and respond to any commands
+
+while true
+run_tweetstream
+(if tweetstream breaks because command message, restarts with new parameters provided by command)
 
 AMQP.start(:host => 'localhost') do |connection, open_ok|
   AMQP::Channel.new(connection) do |channel, open_ok|
@@ -45,4 +71,4 @@ AMQP.start(:host => 'localhost') do |connection, open_ok|
     end
   end
 end
-
+=end
