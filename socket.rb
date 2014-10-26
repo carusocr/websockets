@@ -8,7 +8,8 @@ require 'bunny'
 
 conn = Bunny.new
 conn.start
-ch = conn.default_channel
+ch = conn.create_channel
+#ch = conn.default_channel
 cq = ch.queue("command")
 tq = ch.queue("tweets")
 cq.publish("Testing command queue")
