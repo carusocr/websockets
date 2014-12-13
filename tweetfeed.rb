@@ -25,6 +25,7 @@ keywords = 'RT'
 conn = Bunny.new
 conn.start
 ch = conn.create_channel
+$x = ch.default_exchange
 $tq = ch.queue("tweets")
 $cq = ch.queue("command")
 
@@ -50,12 +51,13 @@ def monitor_stream(keywords)
       tweet_text = contents['text'].gsub("\t","").gsub("\n","")
       tweetstring = "#{pt1}\t#{pt2}\t#{user}\t#{tweet_text}\n"
       puts tweetstring
-      $tq.publish(tweetstring)
+      $x.publish(tweetstring, :routing_key => $tq.name)
     end
   end
 end
 
-#monitor_stream(keywords)
+monitor_stream(keywords)
+
 # ^^^ this works!
 
 # popping a queue when there's a message returns array...pop[2] fetches body
