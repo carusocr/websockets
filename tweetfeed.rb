@@ -29,14 +29,14 @@ $x = ch.default_exchange
 $tq = ch.queue("tweets")
 $cq = ch.queue("command")
 
-#$cq.subscribe(:block => true) do |delivery_info, properties, body|
-#  puts "Got command #{body}."
-#  cq.publish("Acknowledged.", :routing_key => cq.name)
-#end
-#$tq.subscribe(:block => true) do |delivery_info, properties, body|
-#  puts "Got command #{body}."
-#  tq.publish("Acknowledged.", :routing_key => tq.name)
-#end
+$cq.subscribe(:block => true) do |delivery_info, properties, body|
+  puts "Got command #{body}."
+  #$x.publish("Acknowledged.", :routing_key => $cq.name)
+end
+$tq.subscribe(:block => true) do |delivery_info, properties, body|
+  puts "Got command #{body}."
+  #$x.publish("Acknowledged.", :routing_key => $tq.name)
+end
 
 def monitor_stream(keywords)
 
@@ -56,7 +56,7 @@ def monitor_stream(keywords)
   end
 end
 
-monitor_stream(keywords)
+#monitor_stream(keywords)
 
 # ^^^ this works!
 
