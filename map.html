@@ -161,7 +161,8 @@ function initialize() {
   map = new google.maps.Map(document.getElementById('map-canvas'),
     mapOptions);
 //testing websocket
-  ws = new WebSocket("ws://localhost:8080/");
+//  ws = new WebSocket("ws://localhost:8080/");
+  ws = new WebSocket("ws://localhost:8567/");
   ws.onmessage = function(evt) {
     var points = evt.data.split("\t");
     var point = new google.maps.LatLng(parseFloat(points[0]),parseFloat(points[1]));
