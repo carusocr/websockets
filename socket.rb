@@ -12,7 +12,8 @@ ch = conn.create_channel
 cq = ch.queue("command")
 tq = ch.queue("tweets")
 EM.run {
-  EM::WebSocket.run(:host => "0.0.0.0", :port => 8567) do |ws|
+  EM::WebSocket.run(:host => "127.0.0.1", :port => 8567) do |ws|
+  #EM::WebSocket.run(:host => "127.0.0.1", :port => 8080) do |ws|
     ws.onopen do
       puts "WebSocket opened"
 #      conn = Bunny.new
