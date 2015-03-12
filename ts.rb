@@ -6,10 +6,11 @@
 require 'em-websocket'
 require 'bunny'
 
-conn = Bunny.new
-conn.start
-$ch = conn.create_channel
-$tq = $ch.queue("tweets")
+#conn = Bunny.new
+#conn.start
+#$ch = conn.create_channel
+#$x= $ch.default_exchange
+#$tq = $ch.queue("tweets")
 
 #=begin
 
@@ -42,14 +43,19 @@ def test2 #fails with subscribe block...why?
       ws.onopen do
         puts "WebSocket opened"
         ws.send "test"
+        #moving the bunny channel create into the onopen works!
+        conn = Bunny.new
+        conn.start
+        $ch = conn.create_channel
+        $ch.queue("tweets").subscribe do |delinfo, properties, body|
+          puts 'got one'
+          ws.send body
+        end
         #commenting this out allows test to go through, uncommenting prevents. ?!?
-        # when I uncommented and ran this, got back two "Got one!" messages. 
-        # Am I screwing up by using the tq and basically sending messages to myself? 
-        # Bonehead mistake.
-#        $tq.subscribe(:block=>true) do |delinfo, properties, body|
-#          puts "Got one! Sending test to map..."
-#          ws.send "test"
-#        end
+        #$tq.subscribe(:block=>true) do |delinfo, properties, body|
+        #  puts "Got one! Sending test to map..."
+        #  ws.send "test"
+        #end
       end
       ws.onclose do
         ws.close(code = nil, body = nil)
