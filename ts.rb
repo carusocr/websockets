@@ -42,23 +42,22 @@ def test2 #fails with subscribe block...why?
       ws.onopen do
         puts "WebSocket opened"
         ws.send "test"
-        sleep 3
-        ws.send "test"
-        sleep 2
-        ws.send "test"
         #commenting this out allows test to go through, uncommenting prevents. ?!?
         # when I uncommented and ran this, got back two "Got one!" messages. 
         # Am I screwing up by using the tq and basically sending messages to myself? 
         # Bonehead mistake.
-        $tq.subscribe(:block=>true) do |delinfo, properties, body|
-          puts "Got one! Sending test to map..."
-          ws.send "test"
-        end
+#        $tq.subscribe(:block=>true) do |delinfo, properties, body|
+#          puts "Got one! Sending test to map..."
+#          ws.send "test"
+#        end
       end
       ws.onclose do
         ws.close(code = nil, body = nil)
         puts "WebSocket closed"
         exit
+      end
+      ws.onmessage do
+        puts "Got reply message from map.html"
       end
     end
   }
