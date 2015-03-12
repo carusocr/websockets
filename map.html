@@ -172,6 +172,10 @@ function initialize() {
   };
 }
 
+function pingSocket() {
+  ws.send("ZUG");
+};
+
 google.maps.event.addDomListener(window, 'load', initialize);
 
     </script>
@@ -186,6 +190,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
     <button onclick="heatPoints()">Heatmap</button>
     <button onclick="markPoints()">Markers</button>
     <button onclick="initialize()">Reset Map</button>
+    <button onclick="pingSocket()">Ping Socket</button>
     </div>
   </body>
 </div>
