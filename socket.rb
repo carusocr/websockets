@@ -49,5 +49,9 @@ EM.run {
       puts "WebSocket closed"
       exit
     end
+    # this receives even though the rabbitmq subscription is looping...cool.
+    ws.onmessage do
+      puts "got message!"
+    end
   end
 }
