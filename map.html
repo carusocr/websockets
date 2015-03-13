@@ -161,14 +161,20 @@ function initialize() {
   map = new google.maps.Map(document.getElementById('map-canvas'),
     mapOptions);
 //testing websocket
-  ws = new WebSocket("ws://localhost:8080/");
+//  ws = new WebSocket("ws://localhost:8080/");
+  ws = new WebSocket("ws://localhost:8567/");
   ws.onmessage = function(evt) {
+//    alert(evt.data);
     var points = evt.data.split("\t");
     var point = new google.maps.LatLng(parseFloat(points[0]),parseFloat(points[1]));
     var tweet_load = "<p>" + points[2] + "<br />" + points[3] + "</p>";
     createMarker(parseFloat(points[0]),parseFloat(points[1]),tweet_load);
   };
 }
+
+function pingSocket() {
+  ws.send("ZUG");
+};
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
@@ -184,6 +190,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
     <button onclick="heatPoints()">Heatmap</button>
     <button onclick="markPoints()">Markers</button>
     <button onclick="initialize()">Reset Map</button>
+    <button onclick="pingSocket()">Ping Socket</button>
     </div>
   </body>
 </div>
