@@ -17,9 +17,8 @@ TweetStream.configure do |config|
   config.auth_method        = cnf['ebola']['a_meth']
 end
 
-keywords = 'burrito, sushi'
 #keywords = 'zokfotpik'
-#keywords = 'RT'
+keywords = 'RT'
 
 
 conn = Bunny.new
