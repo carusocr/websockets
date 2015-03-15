@@ -40,16 +40,13 @@ def kill_tweetstream
     puts "Found and killing tweetstream process number #{t}"
     Process.kill("KILL",t.to_i)
   end
-  puts "Restarting tweetfeed process..."
-# this prevents map from receiving messages, but manually restarting tweetfeed continues markering.
-# Why? Something about the backticked tweetfeed, maybe?
-# reference your code in streaming.rb and fork these instead of just backticking
-#  sleep 1
-#  `ruby tweetfeed.rb RT`
+  puts "Starting tweetfeed process..."
+  Process.fork {start_tweetstream("RT")}
 end
 
-#kill_tweetstream
-#exit
+def start_tweetstream(searchterm)
+  `ruby tweetfeed.rb #{searchterm}`
+end
 
 EM.run {
   EM::WebSocket.run(:host => "127.0.0.1", :port => 8567) do |ws|
@@ -73,16 +70,10 @@ EM.run {
     # this receives even though the rabbitmq subscription is looping...cool.
     ws.onmessage do |msg|
       puts "got message!"
-      if msg == "ZUG"
+      if msg == "ZUG" # change this to receive actual searchterms from map
         puts "Got kill orders."
         kill_tweetstream
-        #this works...after this, restart tweetstream with new arguments
-        #restart works, and socket gets tweets from new tweetstream, but map isn't
-        # receiving tweets from socket after restart
       end
-#      ch.default_exchange.publish("ZUG", :routing_key => ch.queue("command").name) 
-# HOWEVER, using this causes websocket to close. Why?
-    #try brute force method of kill and restart?
     end
   end
 }
