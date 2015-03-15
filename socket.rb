@@ -21,17 +21,38 @@ tweets collected.
 4. Keyword search, would work in same manner as language spec in terms of interprocess
 communication.
 
+Extra notes: I'm having trouble with using bunny for bidirectional communication. Brute
+forcing process control by having the map.html send a 'restart' message and then having
+socket.rb send a Process.kill command to tweetfeed and then restarting it with a new 
+set of parameters may work. Got the kill part functional, test out the next step.o
+
+** start playing with forking of child processes...this might be a good solution.
+
 =end
 
 require 'em-websocket'
 require 'uuid'
 require 'bunny'
 
-#cq = ch.queue("command")
-#tq = ch.queue("tweets")
+def kill_tweetstream
+  targets = (`ps -ef | grep -v grep | grep 'ruby tweetfeed' | grep -v #{$$} | awk '{print $2}'`).split
+  targets.each do |t|
+    puts "Found and killing tweetstream process number #{t}"
+    Process.kill("KILL",t.to_i)
+  end
+  puts "Restarting tweetfeed process..."
+# this prevents map from receiving messages, but manually restarting tweetfeed continues markering.
+# Why? Something about the backticked tweetfeed, maybe?
+# reference your code in streaming.rb and fork these instead of just backticking
+#  sleep 1
+#  `ruby tweetfeed.rb RT`
+end
+
+#kill_tweetstream
+#exit
+
 EM.run {
   EM::WebSocket.run(:host => "127.0.0.1", :port => 8567) do |ws|
-  #EM::WebSocket.run(:host => "127.0.0.1", :port => 8080) do |ws|
     ws.onopen do
       puts "WebSocket opened"
       conn = Bunny.new
@@ -50,36 +71,18 @@ EM.run {
       exit
     end
     # this receives even though the rabbitmq subscription is looping...cool.
-    ws.onmessage do
+    ws.onmessage do |msg|
       puts "got message!"
+      if msg == "ZUG"
+        puts "Got kill orders."
+        kill_tweetstream
+        #this works...after this, restart tweetstream with new arguments
+        #restart works, and socket gets tweets from new tweetstream, but map isn't
+        # receiving tweets from socket after restart
+      end
 #      ch.default_exchange.publish("ZUG", :routing_key => ch.queue("command").name) 
 # HOWEVER, using this causes websocket to close. Why?
-    end
-  end
-}
-
-EM.run {    #second websocket instance, trying to talk to tweetstream...
-  EM::WebSocket.run(:host => "127.0.0.1", :port => 8567) do |ws|
-  #EM::WebSocket.run(:host => "127.0.0.1", :port => 8080) do |ws|
-    ws.onopen do
-      puts "WebSocket opened"
-      conn = Bunny.new
-      conn.start
-      ch = conn.create_channel
-      ch.queue("tweets").subscribe do |delivery_info, properties, body|
-        puts "Received tweet\n"
-        encoded_tweet=body.force_encoding("iso-8859-1").force_encoding("utf-8")
-        puts encoded_tweet
-        ws.send encoded_tweet
-      end
-    end
-    ws.onclose do
-      ws.close(code = nil, body = nil)
-      puts "WebSocket closed"
-      exit
-    end
-    ws.onmessage do
-      puts "got message!"
+    #try brute force method of kill and restart?
     end
   end
 }
