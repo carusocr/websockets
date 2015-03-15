@@ -17,8 +17,8 @@ TweetStream.configure do |config|
   config.auth_method        = cnf['ebola']['a_meth']
 end
 
-keywords = 'burrito, sushi'
 #keywords = 'zokfotpik'
+keywords = ARGV[0]
 #keywords = 'RT'
 
 
@@ -56,43 +56,5 @@ def monitor_stream(keywords)
   end
 end
 
+#testing out wrapping this in a websocket handler to listen to socket's commands...
 monitor_stream(keywords)
-
-# ^^^ this works!
-
-# popping a queue when there's a message returns array...pop[2] fetches body
-
-=begin
-IDEAS:
-
-check bunny queue inside of stream track loop?
-1. start tweetstream loop
-2. if command queue isn't empty, parse data and respond to any commands
-  ch.queue.message_count should return 0 or 1
-
-while true
-run_tweetstream
-(if tweetstream breaks because command message, restarts with new parameters provided by command)
-
-AMQP.start(:host => 'localhost') do |connection, open_ok|
-  AMQP::Channel.new(connection) do |channel, open_ok|
-    twitter = channel.fanout("twitter")
-
-    stream = TweetStream::Client.new
-    stream.track(keywords) do |status|
-      if status.geo?
-        tweet = JSON.generate(status.attrs)
-        contents = JSON.parse(tweet)
-        pt1 = contents['coordinates']['coordinates'][1]
-        pt2 = contents['coordinates']['coordinates'][0]
-        user = contents['user']['screen_name']
-        tweet_text = contents['text'].gsub("\t","").gsub("\n","")
-        tweetstring = "#{pt1}\t#{pt2}\t#{user}\t#{tweet_text}\n"
-        puts tweetstring
-        twitter.publish(tweetstring)
-      end
-      # add else, send non loc message and update it in scrolling window?
-    end
-  end
-end
-=end
