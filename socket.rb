@@ -34,14 +34,14 @@ require 'em-websocket'
 require 'uuid'
 require 'bunny'
 
-def kill_tweetstream
+def kill_tweetstream(searchterm)
   targets = (`ps -ef | grep -v grep | grep 'ruby tweetfeed' | grep -v #{$$} | awk '{print $2}'`).split
   targets.each do |t|
     puts "Found and killing tweetstream process number #{t}"
     Process.kill("KILL",t.to_i)
   end
   puts "Starting tweetfeed process..."
-  Process.fork {start_tweetstream("RT")}
+  Process.fork {start_tweetstream(searchterm)}
 end
 
 def start_tweetstream(searchterm)
@@ -69,11 +69,8 @@ EM.run {
     end
     # this receives even though the rabbitmq subscription is looping...cool.
     ws.onmessage do |msg|
-      puts "got message!"
-      if msg == "ZUG" # change this to receive actual searchterms from map
-        puts "Got kill orders."
-        kill_tweetstream
-      end
+      puts "got message of #{msg}!"
+      kill_tweetstream(msg)
     end
   end
 }
