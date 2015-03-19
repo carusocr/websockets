@@ -174,8 +174,9 @@ function initialize() {
   };
 }
 
-function pingSocket() {
-  var searchterm = prompt("Enter search keyword(s)");
+function startSearch() {
+  var searchterm = prompt("Enter individual search keyword(s), separated by commas");
+  searchterm = "START " + searchterm
   ws.send(searchterm);
 };
 
@@ -193,7 +194,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
     <button onclick="heatPoints()">Heatmap</button>
     <button onclick="markPoints()">Markers</button>
     <button onclick="initialize()">Reset Map</button>
-    <button onclick="pingSocket()">Start!</button>
+    <button onclick="startSearch()">Track Keywords</button>
     </div>
   </body>
 </div>
