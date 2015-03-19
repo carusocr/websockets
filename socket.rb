@@ -20,6 +20,7 @@ saved to a file (along with the rest). A counter somewhere would list a running 
 tweets collected.
 4. Keyword search, would work in same manner as language spec in terms of interprocess
 communication.
+5. Cleaner handling of heatmaps, loading point from file.
 
 Extra notes: I'm having trouble with using bunny for bidirectional communication. Brute
 forcing process control by having the map.html send a 'restart' message and then having
@@ -34,17 +35,17 @@ require 'em-websocket'
 require 'uuid'
 require 'bunny'
 
-def kill_tweetstream(searchterm)
+def refresh_tweetstream(searchterm)
   targets = (`ps -ef | grep -v grep | grep 'ruby tweetfeed' | grep -v #{$$} | awk '{print $2}'`).split
   targets.each do |t|
     puts "Found and killing tweetstream process number #{t}"
     Process.kill("KILL",t.to_i)
   end
   puts "Starting tweetfeed process..."
-  Process.fork {start_tweetstream(searchterm)}
+  Process.fork {start_tweetstream_process(searchterm)}
 end
 
-def start_tweetstream(searchterm)
+def start_tweetstream_process(searchterm)
   `ruby tweetfeed.rb #{searchterm}`
 end
 
@@ -69,8 +70,15 @@ EM.run {
     end
     # this receives even though the rabbitmq subscription is looping...cool.
     ws.onmessage do |msg|
-      puts "got message of #{msg}!"
-      kill_tweetstream(msg)
+      if msg =~ /^START/
+        # need to add some formatting to this...
+        msg = msg.gsub(' ',',')
+        msg = msg[6,msg.length]
+        puts "tracking keywords #{msg}..."
+        refresh_tweetstream(msg)
+      else
+        puts "Got unintelligible command, please resend."
+      end
     end
   end
 }
