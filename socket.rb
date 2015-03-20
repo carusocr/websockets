@@ -22,13 +22,6 @@ tweets collected.
 communication.
 5. Cleaner handling of heatmaps, loading point from file.
 
-Extra notes: I'm having trouble with using bunny for bidirectional communication. Brute
-forcing process control by having the map.html send a 'restart' message and then having
-socket.rb send a Process.kill command to tweetfeed and then restarting it with a new 
-set of parameters may work. Got the kill part functional, test out the next step.o
-
-** start playing with forking of child processes...this might be a good solution.
-
 =end
 
 require 'em-websocket'
@@ -73,7 +66,7 @@ EM.run {
       if msg =~ /^START/
         # need to add some formatting to this...
         msg = msg.gsub(' ',',')
-        msg = msg[6,msg.length]
+        msg = msg[6,msg.length] # remove command word
         puts "tracking keywords #{msg}..."
         refresh_tweetstream(msg)
       else
