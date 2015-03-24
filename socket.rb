@@ -64,6 +64,8 @@ EM.run {
     # this receives even though the rabbitmq subscription is looping...cool.
     ws.onmessage do |msg|
       if msg =~ /^START/
+        puts "got #{msg}\n"
+        exit
         # need to add some formatting to this...
         msg = msg.gsub(' ',',')
         msg = msg[6,msg.length] # remove command word
