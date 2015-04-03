@@ -34,16 +34,6 @@ reader.onload = function(event) {
   console.log(contents);
 }
 
-//websocket
-
-//var scheme = "ws://";
-//var uri = scheme + window.document.location.host + "/";
-//var ws = new WebSocket("ws:///Users/carusocr/projects/websockets/map.html");
-
-//ws.onmessage function(message) {
-//  var data = JSON.parse(message.data);
-//  alert("Got one!");
-//};
 function heatPoints() {
   clearMarkers();
   var fileInput = document.getElementById("fileInput");
@@ -71,8 +61,7 @@ function heatPoints() {
      data: pointArray
     });
     heatmap.setMap(map);
-    //testing out recentering of map
-    //buggy - doesn't play well with low number of points...is there a 0,0?
+    // recenter map
     moveToLocation(avg_lat, avg_long);
   }
   reader.readAsText(file);
@@ -150,7 +139,7 @@ function handleChange() {
 
 function initialize() {
   document.getElementById("fileName").value="";
-  var newpoints=[];
+  //test nulling out fileInput and markers 
   var myLatLong = new google.maps.LatLng(6.488619,3.359756);
   var mapOptions = {
     zoom: 2,
@@ -184,6 +173,7 @@ function startSearch() {
     keywords = "START " + keywords;
     ws.send(keywords);
   }
+// vv This is closing websocket? vv
   reader.readAsText(file);
 //  var searchterm = prompt("Enter individual search keyword(s), separated by commas");
 //  keywords = "START " + keywords;
