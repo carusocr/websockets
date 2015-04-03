@@ -22,6 +22,13 @@ tweets collected.
 communication.
 5. Cleaner handling of heatmaps, loading point from file.
 
+
+***TROUBLESHOOTING/BUG LIST
+
+1. map.html is closing websocket after sending keyword list.
+2. map.html doesn't clear contents of loaded files after "Reset Map".
+
+***
 =end
 
 require 'em-websocket'
@@ -70,7 +77,7 @@ EM.run {
         msg = msg.gsub(' ',',')
         msg = msg[6,msg.length] # remove command word
         puts "tracking keywords #{msg}..."
-        refresh_tweetstream(msg)
+#        refresh_tweetstream(msg)
       else
         puts "Got unintelligible command, please resend."
       end
