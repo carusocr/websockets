@@ -72,12 +72,11 @@ EM.run {
     ws.onmessage do |msg|
       if msg =~ /^START/
         puts "got #{msg}\n"
-        exit
         # need to add some formatting to this...
         msg = msg.gsub(' ',',')
         msg = msg[6,msg.length] # remove command word
         puts "tracking keywords #{msg}..."
-#        refresh_tweetstream(msg)
+        refresh_tweetstream(msg)
       else
         puts "Got unintelligible command, please resend."
       end
