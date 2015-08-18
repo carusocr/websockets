@@ -50,7 +50,7 @@ def start_tweetstream_process(searchterm)
 end
 
 EM.run {
-  EM::WebSocket.run(:host => "127.0.0.1", :port => 8567) do |ws|
+  EM::WebSocket.run(:host => "127.0.0.1", :port => 8568) do |ws|
     ws.onopen do
       puts "WebSocket opened"
       conn = Bunny.new
